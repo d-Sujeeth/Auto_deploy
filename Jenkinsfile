@@ -17,7 +17,7 @@ pipeline {
         stage('Push') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub_credentials_id') {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub_credentials') {
                         docker.image("sujeethcloud/image").push("latest")
                     }
                 }
