@@ -6,3 +6,6 @@ app = FastAPI()
 def read_root():
     return "Hello Ex-President Mr.Pradeep"
 
+@app.get("/app")
+def read_root():
+    return "Hello Ex-President Mr.Pradeep"
