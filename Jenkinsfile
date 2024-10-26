@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/d-Sujeeth/Auto_deploy.git' , branch: 'main'
+                git url: 'https://github.com/d-Sujeeth/Auto_deploy.git', branch: 'main'
             }
         }
         stage('Build') {
@@ -17,7 +17,7 @@ pipeline {
         stage('Push') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub_credentials') {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub_credentials_id') {
                         docker.image("sujeethcloud/image").push("latest")
                     }
                 }
@@ -25,4 +25,3 @@ pipeline {
         }
     }
 }
-
