@@ -1,4 +1,4 @@
-# Scalable FastAPI Applications Using Docker, Jenkins, Traefik, and Watchtower for Continuous Deployment
+# Scalable Microservice backend Applications Using Docker, Jenkins, Traefik, and Watchtower 
 
 ### Watchtower
 Watchtower automates the updating of Docker containers by monitoring them for new image versions. It simplifies container maintenance, ensuring applications run the latest versions with minimal manual intervention, thereby enhancing operational efficiency and reducing downtime during updates.
