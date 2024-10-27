@@ -1,4 +1,4 @@
-# Scalable Microservice backend Applications Using Docker, Jenkins, Traefik, and Watchtower 
+# Scalable Microservice backend Applications Using Docker Compose , Jenkins, Traefik, and Watchtower 
 
 ### Watchtower
 Watchtower automates the updating of Docker containers by monitoring them for new image versions. It simplifies container maintenance, ensuring applications run the latest versions with minimal manual intervention, thereby enhancing operational efficiency and reducing downtime during updates.
@@ -9,5 +9,5 @@ Jenkins automates the CI/CD process, integrating code building, testing, and dep
 ### Traefik
 Traefik serves as a dynamic reverse proxy, routing incoming traffic to appropriate services based on defined rules. It offers load balancing across service replicas, ensuring high availability. Traefik's real-time service detection allows seamless configuration adjustments without restarts.
 
-### Docker
-Docker facilitates containerization, packaging applications with their dependencies into isolated environments. This ensures consistency across development and production. It enhances scalability, allowing easy movement of containers between environments, while reducing software conflicts and improving security through isolation.
+### Application 
+
