@@ -7,7 +7,7 @@ pipeline {
                 git url: 'https://github.com/d-Sujeeth/Auto_deploy.git', branch: 'main'
             }
         }
-        stage('Build') {
+        stage('Build') { 
             steps {
                 script {
                     docker.build("sujeethcloud/image")
