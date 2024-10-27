@@ -1,18 +1,22 @@
-# Dockerized FastAPI Application with Watchtower and Traefik
+# FastAPI and Traefik and watchtower Docker Setup
 
-This project demonstrates how to run a Dockerized FastAPI application with Watchtower for automatic updates and Traefik as a reverse proxy/load balancer using Docker Compose.
+This repository contains a Dockerized FastAPI application, configured with Traefik as a reverse proxy and load balancer. The setup includes Watchtower for automatic container updates.
 
-## Prerequisites
+## Project Structure
 
-- **Docker**: Ensure Docker is installed on your machine.
-- **Docker Hub Account**: Create an account to push your Docker images.
-- **Docker Compose**: Install Docker Compose for easier multi-container management.
+```
+.
+├── docker-compose.yml
+├── Dockerfile
+└── app
+    └── app.py
+```
 
-## Setup Steps
+## Components
 
-### 1. Create Your FastAPI Application
+### FastAPI
 
-Create a simple FastAPI app in `app/main.py`:
+A simple FastAPI application that responds with a greeting.
 
 ```python
 from fastapi import FastAPI
@@ -20,69 +24,49 @@ from fastapi import FastAPI
 app = FastAPI()
 
 @app.get("/")
-async def read_root():
-    return {"Hello": "World"}
+def read_root():
+    return "Hello Void"
 ```
 
-### 2. Create a Dockerfile
+### Dockerfile
 
-Add a Dockerfile to the root of your project:
+The Dockerfile used to build the FastAPI application:
 
 ```Dockerfile
-# Dockerfile
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9
+FROM python:3.10-alpine 
 
-COPY ./app /app
+WORKDIR /app
 
-RUN pip install --no-cache-dir -r /app/requirements.txt
+COPY . /app
 
-EXPOSE 80
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+RUN pip install uvicorn FastAPI
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-### 3. Create a Traefik Configuration
+### docker-compose.yml
 
-Create a Traefik configuration file `traefik/traefik.yml`:
-
-```yaml
-entryPoints:
-  web:
-    address: ":80"
-
-providers:
-  docker:
-    exposedByDefault: false
-
-api:
-  dashboard: true
-```
-
-Create an `acme.json` file for SSL certificates:
-
-```bash
-touch traefik/acme.json
-chmod 600 traefik/acme.json
-```
-
-### 4. Create a Docker Compose File
-
-Create a `docker-compose.yml` file in the root directory:
+The Docker Compose configuration for deploying the application with Traefik and Watchtower.
 
 ```yaml
 version: '3.8'
 
 services:
-  app:
-    image: sujeethcloud/one:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=Host(`localhost`)"
-      - "traefik.http.services.app.loadbalancer.server.port=80"
+  fastapi:
+    image: sujeethcloud/image:latest
+    deploy:
+      replicas: 3
+      mode: replicated
+    ports:
+      - "8000:8000"  # Explicit port mapping
     networks:
       - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/backend`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
 
   traefik:
     image: traefik:v2.5
@@ -93,71 +77,38 @@ services:
     ports:
       - "80:80"
       - "8080:8080"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./traefik/traefik.yml:/traefik.yml"
-      - "./traefik/acme.json:/acme.json"
     networks:
       - backend
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
 
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
-    restart: unless-stopped
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 60 --cleanup sujeethcloud/one
-    networks:
-      - backend
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    command: --interval 30
 
 networks:
   backend:
+    driver: bridge
 ```
 
-### 5. Build and Push Your Image
+## How to Run
 
-Build and push your Docker image:
+1. Clone this repository:
+   ```bash
+   git clone <repository-url>
+   cd <repository-directory>
+   ```
 
-```bash
-# Build the Docker image
-docker build -t sujeethcloud/one:latest .
+2. Build and run the containers:
+   ```bash
+   docker-compose up --build
+   ```
 
-# Push the Docker image to Docker Hub
-docker push sujeethcloud/one:latest
-```
+3. Access the FastAPI application at `http://localhost:8000` and the Traefik dashboard at `http://localhost:8080`.
 
-### 6. Start the Services
+## Load Balancing
 
-Run Docker Compose to start all services:
-
-```bash
-docker-compose up -d
-```
-
-## Verification
-
-Check the logs of Watchtower and Traefik to verify they are running correctly:
-
-```bash
-docker logs watchtower
-docker logs traefik
-```
-
-Access your FastAPI application via Traefik at `http://localhost`, and the Traefik dashboard at `http://localhost:8080`.
-
-## Troubleshooting
-
-If updates are not detected:
-
-- **Verify Image Tags**: Ensure your image is correctly tagged as `latest`.
-- **Re-push Image**: Push a new version of your image to Docker Hub.
-- **Clear Docker Cache**: If necessary, clear the Docker cache:
-
-```bash
-docker system prune
-```
-
-If Traefik is not routing requests:
-
-- **Check Traefik Logs**: Look for errors or warnings.
-- **Ensure Docker Labels**: Add appropriate labels to your FastAPI container to expose it to Traefik.
+Traefik routers manage incoming requests and direct them to the appropriate service while also enabling load balancing by distributing requests across multiple service instances, ensuring high availability and performance.
