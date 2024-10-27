@@ -2,7 +2,7 @@ pipeline {
     agent any
  
     stages {
-        stage('Checkout') {       
+        stage('Checkout') {           
             steps {
                 git url: 'https://github.com/d-Sujeeth/Auto_deploy.git', branch: 'main'
             }
