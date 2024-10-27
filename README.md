@@ -1,6 +1,4 @@
-# FastAPI and Traefik and watchtower Docker Setup
-
-This repository contains a Dockerized FastAPI application, configured with Traefik as a reverse proxy and load balancer. The setup includes Watchtower for automatic container updates.
+# FastAPI and Traefik and Watchtower with Jenkins and Docker Setup
 
 ## Project Structure
 
